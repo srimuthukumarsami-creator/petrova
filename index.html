@@ -1,112 +1,892 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>PETROVA AI</title>
-<style>
-body{
-    font-family: Arial;
-    background:#0f172a;
-    color:white;
-    text-align:center;
-}
-h1{
-    font-size:40px;
-    color:#38bdf8;
-}
-button{
-    padding:10px 20px;
-    margin:10px;
-    border:none;
-    border-radius:20px;
-    background:#38bdf8;
-    cursor:pointer;
-}
-.card{
-    background:#1e293b;
-    padding:20px;
-    margin:20px auto;
-    width:300px;
-    border-radius:15px;
-}
-</style>
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PETROVA — Experience Your Future</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       TOKENS
+    ═══════════════════════════════════════════════════════════ */
+    :root {
+      --bg:        #050A10;
+      --surface:   #0C1420;
+      --card:      #111B2A;
+      --border:    rgba(0,200,255,.12);
+      --accent:    #00C8FF;
+      --accent2:   #7B61FF;
+      --accent3:   #FF6B6B;
+      --text:      #E8F4FD;
+      --muted:     #6A8AA8;
+      --grad:      linear-gradient(135deg, #00C8FF 0%, #7B61FF 100%);
+      --glow:      0 0 60px rgba(0,200,255,.18);
+    }
 
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       NOISE + GRID OVERLAY
+    ═══════════════════════════════════════════════════════════ */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(0,200,255,.04) 60px),
+        repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(0,200,255,.04) 60px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════════════════════════ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 60px;
+      background: rgba(5,10,16,.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.4rem; letter-spacing: .12em;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-size: .85rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color .25s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .nav-cta {
+      padding: 10px 24px; border-radius: 6px;
+      background: var(--grad); color: #fff;
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: .82rem; letter-spacing: .08em;
+      border: none; cursor: pointer; text-decoration: none; text-transform: uppercase;
+      transition: opacity .2s, transform .2s;
+    }
+    .nav-cta:hover { opacity: .85; transform: translateY(-1px); }
+
+    /* ═══════════════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════════════ */
+    #hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 120px 40px 80px;
+      position: relative; overflow: hidden;
+    }
+
+    .hero-orb {
+      position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none;
+    }
+    .orb1 { width: 600px; height: 600px; background: rgba(0,200,255,.09); top: -100px; left: -150px; animation: drift 12s ease-in-out infinite alternate; }
+    .orb2 { width: 500px; height: 500px; background: rgba(123,97,255,.1); bottom: -80px; right: -100px; animation: drift 15s ease-in-out infinite alternate-reverse; }
+    .orb3 { width: 300px; height: 300px; background: rgba(255,107,107,.07); top: 40%; left: 50%; transform: translate(-50%,-50%); animation: pulse 8s ease-in-out infinite; }
+
+    @keyframes drift { to { transform: translate(40px, 30px); } }
+    @keyframes pulse { 0%,100% { opacity: .5; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 1; transform: translate(-50%,-50%) scale(1.2); } }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid var(--border); border-radius: 100px;
+      padding: 6px 18px; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 28px;
+      animation: fadeUp .8s ease both;
+    }
+    .badge-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; animation: blink 1.5s ease infinite; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .2; } }
+
+    h1 {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(3rem, 8vw, 7rem);
+      line-height: 1.0; letter-spacing: -.02em;
+      animation: fadeUp .9s .1s ease both;
+    }
+    h1 span {
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      max-width: 620px; margin: 24px auto 48px;
+      font-size: clamp(1rem, 2vw, 1.2rem); font-weight: 300; line-height: 1.7;
+      color: var(--muted); animation: fadeUp 1s .2s ease both;
+    }
+
+    .hero-actions {
+      display: flex; gap: 16px; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 1s .3s ease both;
+    }
+
+    .btn-primary {
+      padding: 16px 40px; border-radius: 8px;
+      background: var(--grad); color: #fff; border: none; cursor: pointer;
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; letter-spacing: .04em;
+      text-decoration: none; transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 8px 40px rgba(0,200,255,.25);
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 50px rgba(0,200,255,.35); }
+
+    .btn-secondary {
+      padding: 16px 40px; border-radius: 8px;
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); cursor: pointer;
+      font-family: 'Syne', sans-serif; font-weight: 600; font-size: .95rem; letter-spacing: .04em;
+      text-decoration: none; transition: border-color .2s, color .2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-team {
+      margin-top: 70px; font-size: .8rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--muted); animation: fadeUp 1s .4s ease both;
+    }
+    .hero-team strong { color: var(--accent); }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       STATS STRIP
+    ═══════════════════════════════════════════════════════════ */
+    .stats-strip {
+      display: flex; justify-content: center; flex-wrap: wrap; gap: 0;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .stat-item {
+      flex: 1 1 200px; padding: 40px 50px; text-align: center;
+      border-right: 1px solid var(--border);
+      opacity: 0; animation: fadeUp .7s ease both;
+    }
+    .stat-item:last-child { border-right: none; }
+
+    .stat-num {
+      font-family: 'Syne', sans-serif; font-size: 2.8rem; font-weight: 800;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .stat-label { font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       SECTION SCAFFOLD
+    ═══════════════════════════════════════════════════════════ */
+    section { position: relative; padding: 120px 60px; z-index: 1; }
+    .section-inner { max-width: 1200px; margin: 0 auto; }
+
+    .section-label {
+      font-size: .72rem; font-weight: 600; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 16px; display: flex; align-items: center; gap: 12px;
+    }
+    .section-label::before { content:''; flex: 0 0 30px; height: 1px; background: var(--accent); }
+
+    h2 {
+      font-family: 'Syne', sans-serif; font-weight: 800;
+      font-size: clamp(2rem, 4vw, 3.2rem); letter-spacing: -.02em; line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    h2 em { font-style: normal; background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+    .section-intro {
+      font-size: 1.1rem; line-height: 1.8; color: var(--muted);
+      max-width: 600px; margin-bottom: 64px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       PROBLEM SECTION
+    ═══════════════════════════════════════════════════════════ */
+    #problem { background: var(--bg); }
+
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2px;
+    }
+
+    .problem-card {
+      background: var(--card); padding: 40px 36px;
+      border: 1px solid var(--border); border-radius: 2px;
+      position: relative; overflow: hidden;
+      transition: border-color .3s, transform .3s;
+      opacity: 0; animation: fadeUp .7s ease both;
+    }
+    .problem-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--grad); transform: scaleX(0); transform-origin: left;
+      transition: transform .4s;
+    }
+    .problem-card:hover { border-color: rgba(0,200,255,.3); transform: translateY(-4px); }
+    .problem-card:hover::before { transform: scaleX(1); }
+
+    .problem-icon {
+      width: 48px; height: 48px; border-radius: 10px; margin-bottom: 24px;
+      background: rgba(0,200,255,.1); display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .problem-card h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+    .problem-card p { font-size: .92rem; line-height: 1.7; color: var(--muted); }
+
+    .problem-quote {
+      margin-top: 60px; padding: 40px 48px;
+      background: var(--card); border-left: 3px solid var(--accent);
+      font-size: 1.25rem; font-style: italic; font-weight: 300; line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       HOW IT WORKS
+    ═══════════════════════════════════════════════════════════ */
+    #how { background: var(--surface); }
+
+    .steps-wrap {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: start;
+    }
+
+    .steps-list { display: flex; flex-direction: column; gap: 0; }
+
+    .step {
+      display: flex; gap: 24px; padding: 28px 0;
+      border-bottom: 1px solid var(--border); cursor: pointer;
+      transition: border-color .3s;
+      opacity: 0; animation: fadeUp .7s ease both;
+    }
+    .step:last-child { border-bottom: none; }
+    .step:hover { border-color: rgba(0,200,255,.3); }
+
+    .step-num {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem;
+      color: var(--border); min-width: 48px; line-height: 1;
+      transition: color .3s;
+    }
+    .step:hover .step-num { color: var(--accent); }
+
+    .step-content h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
+      margin-bottom: 8px;
+    }
+    .step-content p { font-size: .9rem; line-height: 1.7; color: var(--muted); }
+
+    .steps-visual {
+      position: sticky; top: 120px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px;
+      padding: 48px; min-height: 400px;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      gap: 24px; text-align: center;
+    }
+
+    .visual-icon { font-size: 4rem; animation: float 4s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+    .visual-title {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .visual-desc { font-size: .92rem; color: var(--muted); line-height: 1.7; max-width: 260px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       FEATURES
+    ═══════════════════════════════════════════════════════════ */
+    #features { background: var(--bg); }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;
+    }
+
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 36px 32px; position: relative; overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+      opacity: 0; animation: fadeUp .7s ease both;
+    }
+    .feature-card::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at top left, rgba(0,200,255,.06) 0%, transparent 70%);
+      opacity: 0; transition: opacity .4s;
+    }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: var(--glow); }
+    .feature-card:hover::after { opacity: 1; }
+
+    .feature-icon {
+      font-size: 2rem; margin-bottom: 20px; display: block;
+    }
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+    .feature-card p { font-size: .9rem; line-height: 1.7; color: var(--muted); }
+
+    /* ═══════════════════════════════════════════════════════════
+       IMPACT
+    ═══════════════════════════════════════════════════════════ */
+    #impact {
+      background: var(--surface);
+    }
+
+    .impact-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px;
+    }
+
+    .impact-item {
+      display: flex; gap: 20px; align-items: flex-start;
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 32px;
+      opacity: 0; animation: fadeUp .7s ease both;
+      transition: border-color .3s;
+    }
+    .impact-item:hover { border-color: rgba(0,200,255,.35); }
+
+    .impact-num {
+      font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800;
+      line-height: 1; min-width: 50px;
+      background: var(--grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .impact-text h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 8px;
+    }
+    .impact-text p { font-size: .88rem; line-height: 1.7; color: var(--muted); }
+
+    /* ═══════════════════════════════════════════════════════════
+       TECH STACK
+    ═══════════════════════════════════════════════════════════ */
+    #tech { background: var(--bg); }
+
+    .tech-cols {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;
+    }
+
+    .tech-col {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 36px 30px;
+      opacity: 0; animation: fadeUp .7s ease both;
+    }
+
+    .tech-col h3 {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: .95rem;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 24px;
+    }
+
+    .tech-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .tech-list li {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .9rem; line-height: 1.5; color: var(--muted);
+    }
+    .tech-list li::before { content: '▸'; color: var(--accent); font-size: .7rem; }
+
+    /* ═══════════════════════════════════════════════════════════
+       ROADMAP
+    ═══════════════════════════════════════════════════════════ */
+    #roadmap { background: var(--surface); }
+
+    .roadmap-track {
+      display: flex; flex-direction: column; gap: 0;
+      border-left: 2px solid var(--border); padding-left: 40px; margin-left: 20px;
+    }
+
+    .roadmap-item {
+      position: relative; padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+      opacity: 0; animation: fadeUp .7s ease both;
+    }
+    .roadmap-item:last-child { border-bottom: none; }
+
+    .roadmap-item::before {
+      content: ''; position: absolute;
+      left: -46px; top: 34px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--accent); box-shadow: 0 0 0 4px rgba(0,200,255,.15);
+    }
+
+    .roadmap-item h3 {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 8px;
+    }
+    .roadmap-item p { font-size: .9rem; line-height: 1.7; color: var(--muted); max-width: 680px; }
+
+    /* ═══════════════════════════════════════════════════════════
+       CTA
+    ═══════════════════════════════════════════════════════════ */
+    #cta {
+      background: var(--bg); text-align: center; padding: 140px 60px;
+    }
+
+    .cta-inner {
+      max-width: 700px; margin: 0 auto;
+      background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+      padding: 80px 60px; position: relative; overflow: hidden;
+    }
+
+    .cta-inner::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center top, rgba(0,200,255,.08), transparent 60%);
+      pointer-events: none;
+    }
+
+    .cta-inner blockquote {
+      font-size: 1.15rem; font-style: italic; font-weight: 300; line-height: 1.8;
+      color: var(--muted); margin-bottom: 40px; position: relative; z-index: 1;
+    }
+
+    .cta-inner h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem); position: relative; z-index: 1;
+      margin-bottom: 16px;
+    }
+
+    .cta-inner p {
+      font-size: 1rem; color: var(--muted); line-height: 1.7;
+      margin-bottom: 40px; position: relative; z-index: 1;
+    }
+
+    .cta-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; position: relative; z-index: 1; }
+
+    .cta-badges {
+      display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;
+      margin-top: 48px; position: relative; z-index: 1;
+    }
+
+    .cta-badge {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .82rem; color: var(--muted);
+    }
+    .cta-badge span { font-size: 1.1rem; }
+
+    /* ═══════════════════════════════════════════════════════════
+       TEAM
+    ═══════════════════════════════════════════════════════════ */
+    #team { background: var(--surface); }
+
+    .team-grid {
+      display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;
+    }
+
+    .team-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+      padding: 32px 40px; text-align: center; flex: 1 1 180px; max-width: 220px;
+      transition: border-color .3s, transform .3s;
+      opacity: 0; animation: fadeUp .7s ease both;
+    }
+    .team-card:hover { border-color: rgba(0,200,255,.35); transform: translateY(-4px); }
+
+    .team-avatar {
+      width: 60px; height: 60px; border-radius: 50%;
+      background: var(--grad); margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: #fff;
+    }
+    .team-name {
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; margin-bottom: 6px;
+    }
+    .team-role { font-size: .78rem; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; }
+
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════ */
+    footer {
+      background: var(--bg); border-top: 1px solid var(--border);
+      padding: 40px 60px; display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 16px; font-size: .8rem; color: var(--muted);
+    }
+    footer strong { color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 800; }
+
+    /* ═══════════════════════════════════════════════════════════
+       INTERSECTION OBSERVER – triggers animations on scroll
+    ═══════════════════════════════════════════════════════════ */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1 !important; transform: translateY(0) !important; }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      section { padding: 80px 24px; }
+      .steps-wrap { grid-template-columns: 1fr; }
+      .steps-visual { display: none; }
+      .impact-grid { grid-template-columns: 1fr; }
+      .tech-cols { grid-template-columns: 1fr; }
+      footer { padding: 32px 24px; }
+    }
+
+    @media (max-width: 600px) {
+      h1 { font-size: 2.6rem; }
+      .cta-inner { padding: 48px 28px; }
+    }
+  </style>
+</head>
 <body>
 
-<h1>🚀 PETROVA</h1>
-<p>Experience your future before you choose</p>
+  <!-- ▸ NAV ───────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-logo">PETROVA</div>
+    <ul class="nav-links">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#how">How It Works</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#impact">Impact</a></li>
+      <li><a href="#team">Team</a></li>
+    </ul>
+    <a href="#cta" class="nav-cta">Get Early Access</a>
+  </nav>
 
-<button onclick="start()">Start Simulation</button>
+  <!-- ▸ HERO ──────────────────────────────────────────────── -->
+  <section id="hero">
+    <div class="hero-orb orb1"></div>
+    <div class="hero-orb orb2"></div>
+    <div class="hero-orb orb3"></div>
 
-<div id="quiz" style="display:none;" class="card">
-    <h3 id="question"></h3>
-    <button onclick="answer(0)">Option 1</button>
-    <button onclick="answer(1)">Option 2</button>
-</div>
+    <div class="badge"><span class="badge-dot"></span>HACKINTYM'26 &nbsp;·&nbsp; Team Petrova</div>
 
-<div id="result" class="card"></div>
+    <h1>Connect The<br><span>Dots…</span></h1>
 
-<script>
+    <p class="hero-sub">
+      PETROVA is an AI-powered career simulation platform that lets you step into real-world job roles through task-based experiences — <em>before</em> making any career commitment.
+    </p>
 
-let q = 0;
-let score = 0;
+    <div class="hero-actions">
+      <a href="#how" class="btn-primary">See How It Works</a>
+      <a href="#features" class="btn-secondary">Explore Features</a>
+    </div>
 
-const questions = [
-{
-    question:"You enjoy solving problems using logic?",
-    options:["Yes","No"],
-    answer:0
-},
-{
-    question:"Do you like designing visuals?",
-    options:["Yes","No"],
-    answer:1
-},
-{
-    question:"Do you enjoy working with data?",
-    options:["Yes","No"],
-    answer:0
-}
-];
+    <p class="hero-team">Built by <strong>Team Petrova</strong> &nbsp;·&nbsp; Lead: Valarmathi Chezhiyaan</p>
+  </section>
 
-function start(){
-    document.getElementById("quiz").style.display="block";
-    loadQuestion();
-}
+  <!-- ▸ STATS STRIP ────────────────────────────────────────── -->
+  <div class="stats-strip">
+    <div class="stat-item reveal"><div class="stat-num">5+</div><div class="stat-label">Career Domains</div></div>
+    <div class="stat-item reveal" style="animation-delay:.1s"><div class="stat-num">AI</div><div class="stat-label">Powered Engine</div></div>
+    <div class="stat-item reveal" style="animation-delay:.2s"><div class="stat-num">0</div><div class="stat-label">Wrong Choices</div></div>
+    <div class="stat-item reveal" style="animation-delay:.3s"><div class="stat-num">∞</div><div class="stat-label">Paths to Explore</div></div>
+  </div>
 
-function loadQuestion(){
-    document.getElementById("question").innerText=questions[q].question;
+  <!-- ▸ PROBLEM ────────────────────────────────────────────── -->
+  <section id="problem">
+    <div class="section-inner">
+      <div class="section-label">The Problem</div>
+      <h2>Students are choosing careers <em>blind</em></h2>
+      <p class="section-intro">
+        Millions pick majors, pursue degrees, and enter the workforce — only to discover the role isn't what they imagined. Without real exposure, career decisions are based on assumptions, not experience.
+      </p>
 
-    let buttons=document.querySelectorAll("#quiz button");
-    buttons[0].innerText=questions[q].options[0];
-    buttons[1].innerText=questions[q].options[1];
-}
+      <div class="problem-grid">
+        <div class="problem-card reveal">
+          <div class="problem-icon">🔍</div>
+          <h3>No Real-World Preview</h3>
+          <p>Students lack access to simulated job environments before committing to a career path or degree.</p>
+        </div>
+        <div class="problem-card reveal" style="animation-delay:.1s">
+          <div class="problem-icon">🔀</div>
+          <h3>Wrong Career Choices</h3>
+          <p>Misaligned expectations lead to costly pivots, time loss, and long-term career dissatisfaction.</p>
+        </div>
+        <div class="problem-card reveal" style="animation-delay:.2s">
+          <div class="problem-icon">📉</div>
+          <h3>Industry Unpreparedness</h3>
+          <p>Graduates enter the workforce unprepared, creating a skills gap employers constantly struggle with.</p>
+        </div>
+      </div>
 
-function answer(ans){
-    if(ans===questions[q].answer){
-        score++;
-    }
+      <blockquote class="problem-quote reveal">
+        "Students don't know what a job truly feels like — until they're already in it."
+      </blockquote>
+    </div>
+  </section>
 
-    q++;
+  <!-- ▸ HOW IT WORKS ───────────────────────────────────────── -->
+  <section id="how">
+    <div class="section-inner">
+      <div class="section-label">How It Works</div>
+      <h2>From role selection to <em>career clarity</em></h2>
+      <p class="section-intro">PETROVA's workflow is seamless, intelligent, and continuously improving.</p>
 
-    if(q<questions.length){
-        loadQuestion();
-    }else{
-        showResult();
-    }
-}
+      <div class="steps-wrap">
+        <div class="steps-list">
+          <div class="step reveal">
+            <div class="step-num">01</div>
+            <div class="step-content">
+              <h3>User Selects a Role</h3>
+              <p>Choose from a curated library of career paths across tech, design, business, and more.</p>
+            </div>
+          </div>
+          <div class="step reveal" style="animation-delay:.1s">
+            <div class="step-num">02</div>
+            <div class="step-content">
+              <h3>System Assigns Tasks</h3>
+              <p>Role-specific simulations are generated and calibrated to your current skill level.</p>
+            </div>
+          </div>
+          <div class="step reveal" style="animation-delay:.2s">
+            <div class="step-num">03</div>
+            <div class="step-content">
+              <h3>User Completes Tasks</h3>
+              <p>Hands-on challenges in a realistic, interactive simulation environment.</p>
+            </div>
+          </div>
+          <div class="step reveal" style="animation-delay:.3s">
+            <div class="step-num">04</div>
+            <div class="step-content">
+              <h3>AI Evaluates Performance</h3>
+              <p>Results scored across logic, speed, creativity, and accuracy in real time.</p>
+            </div>
+          </div>
+          <div class="step reveal" style="animation-delay:.4s">
+            <div class="step-num">05</div>
+            <div class="step-content">
+              <h3>System Suggests Next Steps</h3>
+              <p>Continue the path, deepen skills, or explore better-matched alternative roles.</p>
+            </div>
+          </div>
+        </div>
 
-function showResult(){
-    let result=document.getElementById("result");
+        <div class="steps-visual">
+          <div class="visual-icon">🎯</div>
+          <div class="visual-title">Experience First, Choose After</div>
+          <div class="visual-desc">Empowers users to make informed, confident, data-driven career decisions without risk.</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    if(score>=2){
-        result.innerHTML="💻 You are suited for TECH roles like Software Engineer!";
-    }else{
-        result.innerHTML="🎨 You are suited for CREATIVE roles like Designer!";
-    }
-}
+  <!-- ▸ FEATURES ───────────────────────────────────────────── -->
+  <section id="features">
+    <div class="section-inner">
+      <div class="section-label">Platform Features</div>
+      <h2>Everything you need to <em>discover your path</em></h2>
+      <p class="section-intro">PETROVA combines simulation, intelligence, and personalization into one seamless experience.</p>
 
-</script>
+      <div class="features-grid">
+        <div class="feature-card reveal">
+          <span class="feature-icon">🏭</span>
+          <h3>Real-World Task Simulation</h3>
+          <p>Role-specific challenges that replicate actual workplace scenarios and day-to-day job responsibilities across industries.</p>
+        </div>
+        <div class="feature-card reveal" style="animation-delay:.1s">
+          <span class="feature-icon">🤖</span>
+          <h3>AI Career Recommendations</h3>
+          <p>Personalized career suggestions powered by behavioral analysis and real-time performance data.</p>
+        </div>
+        <div class="feature-card reveal" style="animation-delay:.2s">
+          <span class="feature-icon">📊</span>
+          <h3>Performance Tracking</h3>
+          <p>Detailed metrics and progress reports help users understand strengths and growth areas at a glance.</p>
+        </div>
+        <div class="feature-card reveal" style="animation-delay:.3s">
+          <span class="feature-icon">🗺️</span>
+          <h3>Personalized Skill Roadmap</h3>
+          <p>Curated learning pathways tailored to each user's unique goals and current skill level.</p>
+        </div>
+        <div class="feature-card reveal" style="animation-delay:.4s">
+          <span class="feature-icon">⚡</span>
+          <h3>Adaptive Learning System</h3>
+          <p>Dynamic difficulty adjustment ensures continuous challenge and accelerated skill development.</p>
+        </div>
+        <div class="feature-card reveal" style="animation-delay:.5s">
+          <span class="feature-icon">🔗</span>
+          <h3>AI Matching Engine</h3>
+          <p>Intelligent algorithms analyze behavior and performance to recommend the best-fit careers with precision.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- ▸ IMPACT ─────────────────────────────────────────────── -->
+  <section id="impact">
+    <div class="section-inner">
+      <div class="section-label">Real-World Impact</div>
+      <h2>Measurable and <em>transformational</em></h2>
+      <p class="section-intro">PETROVA addresses the gap between what students study and what the real world demands.</p>
+
+      <div class="impact-grid">
+        <div class="impact-item reveal">
+          <div class="impact-num">01</div>
+          <div class="impact-text">
+            <h3>Smarter Career Decisions</h3>
+            <p>Data-driven choices replace guesswork, reducing costly career pivots and long-term regret.</p>
+          </div>
+        </div>
+        <div class="impact-item reveal" style="animation-delay:.1s">
+          <div class="impact-num">02</div>
+          <div class="impact-text">
+            <h3>Reduced Job Mismatch</h3>
+            <p>Employers receive candidates who genuinely understand and fit their chosen roles from day one.</p>
+          </div>
+        </div>
+        <div class="impact-item reveal" style="animation-delay:.2s">
+          <div class="impact-num">03</div>
+          <div class="impact-text">
+            <h3>Industry-Ready Skills</h3>
+            <p>Users arrive at interviews and internships with practical, demonstrated experience already under their belt.</p>
+          </div>
+        </div>
+        <div class="impact-item reveal" style="animation-delay:.3s">
+          <div class="impact-num">04</div>
+          <div class="impact-text">
+            <h3>Increased Confidence</h3>
+            <p>Knowing you've already performed the role removes anxiety and builds lasting self-assurance.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ▸ TECH STACK ─────────────────────────────────────────── -->
+  <section id="tech">
+    <div class="section-inner">
+      <div class="section-label">Under the Hood</div>
+      <h2>Built to <em>scale</em></h2>
+      <p class="section-intro">PETROVA's stack is lean, proven, and ready for rapid growth — no heavy hardware required.</p>
+
+      <div class="tech-cols">
+        <div class="tech-col reveal">
+          <h3>How We Build It</h3>
+          <ul class="tech-list">
+            <li>Frontend: Web &amp; Mobile interface</li>
+            <li>Backend: Python / Node.js</li>
+            <li>AI Engine: Recommendation system</li>
+            <li>Database: User profiles &amp; performance data</li>
+          </ul>
+        </div>
+        <div class="tech-col reveal" style="animation-delay:.1s">
+          <h3>Business Model</h3>
+          <ul class="tech-list">
+            <li>Freemium model (basic free access)</li>
+            <li>Premium simulations &amp; advanced insights</li>
+            <li>Partnerships with companies</li>
+            <li>Integration with learning platforms</li>
+          </ul>
+        </div>
+        <div class="tech-col reveal" style="animation-delay:.2s">
+          <h3>Why It's Feasible</h3>
+          <ul class="tech-list">
+            <li>No heavy hardware required</li>
+            <li>Can be prototyped quickly</li>
+            <li>Uses existing AI &amp; web technologies</li>
+            <li>Proven, scalable infrastructure</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ▸ ROADMAP ────────────────────────────────────────────── -->
+  <section id="roadmap">
+    <div class="section-inner">
+      <div class="section-label">What's Next</div>
+      <h2>Future <em>Scope</em></h2>
+      <p class="section-intro">Our prototype is only the beginning. PETROVA's roadmap charts an ambitious expansion.</p>
+
+      <div class="roadmap-track">
+        <div class="roadmap-item reveal">
+          <h3>Real Company Integration</h3>
+          <p>Partner with leading companies to offer official, branded simulation environments — bridging the gap between platform performance and actual hiring pipelines.</p>
+        </div>
+        <div class="roadmap-item reveal" style="animation-delay:.1s">
+          <h3>Internship &amp; Job Recommendations</h3>
+          <p>Automatically match high-performing users with relevant internships and job openings based on simulation results and verified skills.</p>
+        </div>
+        <div class="roadmap-item reveal" style="animation-delay:.2s">
+          <h3>Certification System</h3>
+          <p>Issue verifiable, performance-based certificates recognized by partner companies and institutions — turning simulation achievements into real credentials.</p>
+        </div>
+        <div class="roadmap-item reveal" style="animation-delay:.3s">
+          <h3>Multi-Domain Expansion</h3>
+          <p>Scale beyond tech into medicine, law, design, finance, and beyond — making PETROVA the universal career discovery platform for every field.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ▸ CTA ────────────────────────────────────────────────── -->
+  <section id="cta">
+    <div class="cta-inner reveal">
+      <blockquote>"Don't choose blindly — experience your future before you decide."</blockquote>
+      <h2>The Future Belongs to Those Who <em>Experience It First</em></h2>
+      <p>PETROVA bridges the critical gap between education and real-world work — transforming career decisions from guesswork into guided, data-driven certainty.</p>
+      <div class="cta-actions">
+        <a href="#how" class="btn-primary">Start Your Simulation</a>
+        <a href="#team" class="btn-secondary">Meet the Team</a>
+      </div>
+      <div class="cta-badges">
+        <div class="cta-badge"><span>🎓</span> Bridges Education &amp; Industry</div>
+        <div class="cta-badge"><span>🤖</span> AI-Driven Precision</div>
+        <div class="cta-badge"><span>🌍</span> Scalable &amp; Impactful</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ▸ TEAM ───────────────────────────────────────────────── -->
+  <section id="team">
+    <div class="section-inner" style="text-align:center;">
+      <div class="section-label" style="justify-content:center;">The Team</div>
+      <h2>Meet <em>Team Petrova</em></h2>
+      <p class="section-intro" style="margin:0 auto 56px;">The minds behind PETROVA — HACKINTYM'26.</p>
+
+      <div class="team-grid">
+        <div class="team-card reveal">
+          <div class="team-avatar">V</div>
+          <div class="team-name">Valarmathi Chezhiyaan</div>
+          <div class="team-role">Team Lead</div>
+        </div>
+        <div class="team-card reveal" style="animation-delay:.1s">
+          <div class="team-avatar">S</div>
+          <div class="team-name">Sri Muthukumar Sami</div>
+          <div class="team-role">Member</div>
+        </div>
+        <div class="team-card reveal" style="animation-delay:.2s">
+          <div class="team-avatar">V</div>
+          <div class="team-name">Vanishree</div>
+          <div class="team-role">Member</div>
+        </div>
+        <div class="team-card reveal" style="animation-delay:.3s">
+          <div class="team-avatar">P</div>
+          <div class="team-name">Pratheeba</div>
+          <div class="team-role">Member</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ▸ FOOTER ─────────────────────────────────────────────── -->
+  <footer>
+    <div><strong>PETROVA</strong> &nbsp;·&nbsp; Connect The Dots…</div>
+    <div>HACKINTYM'26 &nbsp;·&nbsp; Team Petrova</div>
+    <div>AI-Powered Career Simulation Platform</div>
+  </footer>
+
+  <!-- ▸ JS: scroll-triggered reveal ───────────────────────── -->
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    // Animate stats when visible
+    document.querySelectorAll('.stat-item').forEach((el, i) => {
+      el.style.animationDelay = `${i * 0.1}s`;
+      observer.observe(el);
+    });
+  </script>
 </body>
 </html>
